@@ -1,4 +1,3 @@
-use chrono;
 use std::future::Future;
 use tower_util::ServiceExt;
 use trawler::{CommentId, StoryId, UserId};

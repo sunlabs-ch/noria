@@ -220,7 +220,7 @@ impl GroupedOperation for GroupConcat {
 
         // Sort group by columns for consistent output.
         let mut group_cols = self.group.clone();
-        group_cols.sort();
+        group_cols.sort_unstable();
         let group_cols = group_cols
             .iter()
             .map(ToString::to_string)

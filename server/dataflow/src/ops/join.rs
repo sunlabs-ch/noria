@@ -73,7 +73,7 @@ impl Join {
             .collect();
 
         assert_eq!(join_columns.len(), 1, "only supports single column joins");
-        let on = *join_columns.iter().next().unwrap();
+        let on = *join_columns.get(0).unwrap();
 
         let (in_place_left_emit, in_place_right_emit) = {
             let compute_in_place_emit = |left| {
@@ -359,7 +359,7 @@ impl Ingredient for Join {
                     lookup_cols: vec![from_key],
                     replay_cols: replay_key_cols.clone(),
                     // NOTE: we're stealing data here!
-                    record: mem::replace(&mut *rs[i], Vec::new()),
+                    record: std::mem::take(&mut *rs[i]),
                 }));
                 continue;
             }
@@ -411,7 +411,7 @@ impl Ingredient for Join {
                         lookup_cols: vec![from_key],
                         replay_cols: replay_key_cols.clone(),
                         // NOTE: we're stealing data here!
-                        record: mem::replace(&mut *rs[i], Vec::new()),
+                        record: std::mem::take(&mut *rs[i]),
                     }));
                     continue;
                 }
@@ -661,9 +661,9 @@ mod tests {
         j.seed(r, r_y1.clone());
         j.seed(r, r_z2.clone());
 
-        j.one_row(r, r_x1.clone(), false);
-        j.one_row(r, r_y1.clone(), false);
-        j.one_row(r, r_z2.clone(), false);
+        j.one_row(r, r_x1, false);
+        j.one_row(r, r_y1, false);
+        j.one_row(r, r_z2, false);
 
         // forward c3 from left; should produce [c3 + None] since no records in right are 3
         let null = vec![(vec![3.into(), "c".into(), DataType::None], true)].into();
@@ -673,7 +673,7 @@ mod tests {
 
         // doing it again should produce the same result
         j.seed(l, l_c3.clone());
-        let rs = j.one_row(l, l_c3.clone(), false);
+        let rs = j.one_row(l, l_c3, false);
         assert_eq!(rs, null);
 
         // record from the right should revoke the nulls and replace them with full rows
@@ -706,7 +706,7 @@ mod tests {
 
         // forward from left with single matching record on right
         j.seed(l, l_b2.clone());
-        let rs = j.one_row(l, l_b2.clone(), false);
+        let rs = j.one_row(l, l_b2, false);
         assert_eq!(
             rs,
             vec![(vec![2.into(), "b".into(), "z".into()], true)].into()
@@ -714,14 +714,14 @@ mod tests {
 
         // forward from left with two matching records on right
         j.seed(l, l_a1.clone());
-        let rs = j.one_row(l, l_a1.clone(), false);
+        let rs = j.one_row(l, l_a1, false);
         assert_eq!(rs.len(), 2);
         assert!(rs.has_positive(&[1.into(), "a".into(), "x".into()][..]));
         assert!(rs.has_positive(&[1.into(), "a".into(), "y".into()][..]));
 
         // forward from right with two matching records on left (and one more on right)
         j.seed(r, r_w3.clone());
-        let rs = j.one_row(r, r_w3.clone(), false);
+        let rs = j.one_row(r, r_w3, false);
         assert_eq!(
             rs,
             vec![
@@ -733,7 +733,7 @@ mod tests {
 
         // unmatched forward from right should have no effect
         j.seed(r, r_v4.clone());
-        let rs = j.one_row(r, r_v4.clone(), false);
+        let rs = j.one_row(r, r_v4, false);
         assert_eq!(rs.len(), 0);
     }
 

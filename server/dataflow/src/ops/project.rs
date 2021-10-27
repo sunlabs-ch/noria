@@ -93,9 +93,9 @@ impl Project {
 
     pub fn emits(&self) -> (&[usize], &[DataType], &[ProjectExpression]) {
         (
-            self.emit.as_ref().map(Vec::as_slice).unwrap_or(&[]),
-            self.additional.as_ref().map(Vec::as_slice).unwrap_or(&[]),
-            self.expressions.as_ref().map(Vec::as_slice).unwrap_or(&[]),
+            self.emit.as_deref().unwrap_or(&[]),
+            self.additional.as_deref().unwrap_or(&[]),
+            self.expressions.as_deref().unwrap_or(&[]),
         )
     }
 }
@@ -162,7 +162,7 @@ impl Ingredient for Project {
         }
 
         self.lookup(*self.src, &*in_cols, key, nodes, states)
-            .and_then(|result| match result {
+            .map(|result| match result {
                 Some(rs) => {
                     let r = match emit {
                         Some(emit) => Box::new(rs.map(move |r| {
@@ -191,9 +191,9 @@ impl Ingredient for Project {
                         None => Box::new(rs) as Box<_>,
                     };
 
-                    Some(Some(r))
+                    Some(r)
                 }
-                None => Some(None),
+                None => None,
             })
     }
 

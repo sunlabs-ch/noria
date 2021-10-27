@@ -17,7 +17,7 @@ pub struct Distinct {
 impl Distinct {
     pub fn new(src: NodeIndex, group_by: Vec<usize>) -> Self {
         let mut group_by = group_by;
-        group_by.sort();
+        group_by.sort_unstable();
         Distinct {
             src: src.into(),
             us: None,
@@ -190,13 +190,13 @@ mod tests {
         let r3: Vec<DataType> = vec![1.into(), "c".into(), 2.into()];
 
         let a = g.narrow_one_row(r1.clone(), true);
-        assert_eq!(a, vec![r1.clone()].into());
+        assert_eq!(a, vec![r1].into());
 
-        let a = g.narrow_one_row(r2.clone(), false);
+        let a = g.narrow_one_row(r2, false);
         assert_eq!(a.len(), 0);
 
         let a = g.narrow_one_row(r3.clone(), true);
-        assert_eq!(a, vec![r3.clone()].into());
+        assert_eq!(a, vec![r3].into());
     }
 
     #[test]
@@ -213,17 +213,17 @@ mod tests {
 
         let a = g.narrow_one_row(r2.clone(), true);
         println!("{:?}", a);
-        assert_eq!(a, vec![r2.clone()].into());
+        assert_eq!(a, vec![r2].into());
 
         let a = g.narrow_one_row(r3.clone(), true);
-        assert_eq!(a, vec![r3.clone()].into());
+        assert_eq!(a, vec![r3].into());
 
         let a = g.narrow_one_row((r1.clone(), false), true);
         println!("{:?}", a);
 
         let a = g.narrow_one_row((r1.clone(), true), true);
         println!("{:?}", a);
-        assert_eq!(a, vec![r1.clone()].into());
+        assert_eq!(a, vec![r1].into());
     }
 
     #[test]

@@ -1,5 +1,5 @@
 use crate::clients::{Parameters, ReadRequest, VoteClient, WriteRequest};
-use clap;
+
 use failure::ResultExt;
 use redis::AsyncCommands;
 use std::future::Future;

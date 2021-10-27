@@ -1,6 +1,5 @@
 use ahash::RandomState;
 use common::DataType;
-use evmap;
 
 #[derive(Clone, Debug)]
 pub(super) enum Handle {
@@ -55,7 +54,7 @@ impl Handle {
                     );
                     let stack_key = mem::transmute::<_, &(DataType, DataType)>(&stack_key);
                     let map = h.read()?;
-                    let v = map.get(&stack_key).map(then);
+                    let v = map.get(stack_key).map(then);
                     let m = *map.meta();
                     Some((v, m))
                 }

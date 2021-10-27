@@ -1,7 +1,7 @@
 use crate::clients::{Parameters, ReadRequest, VoteClient, WriteRequest};
-use clap;
+
 use failure::{bail, ResultExt};
-use memcached;
+
 use memcached::proto::{MultiOperation, ProtoType};
 use std::future::Future;
 use std::task::{Context, Poll};

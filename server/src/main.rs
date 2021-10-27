@@ -153,9 +153,7 @@ fn main() {
         Some(deployment_name.to_string()),
         persistence_threads,
     );
-    persistence_params.log_dir = matches
-        .value_of("log-dir")
-        .and_then(|p| Some(PathBuf::from(p)));
+    persistence_params.log_dir = matches.value_of("log-dir").map(PathBuf::from);
     builder.set_persistence(persistence_params);
 
     if verbose {

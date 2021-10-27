@@ -170,7 +170,7 @@ impl Ingredient for Filter {
         states: &'a StateMap,
     ) -> Option<Option<Box<dyn Iterator<Item = Cow<'a, [DataType]>> + 'a>>> {
         self.lookup(*self.src, columns, key, nodes, states)
-            .and_then(|result| {
+            .map(|result| {
                 let f = self.filter.clone();
                 let filter = move |r: &[DataType]| {
                     f.iter().all(|(i, ref cond)| {
@@ -200,9 +200,9 @@ impl Ingredient for Filter {
                 match result {
                     Some(rs) => {
                         let r = Box::new(rs.filter(move |r| filter(r))) as Box<_>;
-                        Some(Some(r))
+                        Some(r)
                     }
-                    None => Some(None),
+                    None => None,
                 }
             })
     }
@@ -303,7 +303,7 @@ mod tests {
         assert!(g.narrow_one_row(left.clone(), false).is_empty());
 
         left = vec![2.into(), "b".into()];
-        assert!(g.narrow_one_row(left.clone(), false).is_empty());
+        assert!(g.narrow_one_row(left, false).is_empty());
     }
 
     #[test]
@@ -389,7 +389,7 @@ mod tests {
         left = vec![2.into(), 2.into()];
         assert_eq!(g.narrow_one_row(left.clone(), false), vec![left].into());
         left = vec![2.into(), "b".into()];
-        assert_eq!(g.narrow_one_row(left.clone(), false), Records::default());
+        assert_eq!(g.narrow_one_row(left, false), Records::default());
     }
 
     #[test]

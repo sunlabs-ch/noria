@@ -15,8 +15,8 @@ use tower_service::Service;
 use tower_util::ServiceExt;
 use trawler::{LobstersRequest, TrawlerRequest};
 
-const SCHEMA: &'static str = include_str!("schema.sql");
-const QUERIES: &'static str = include_str!("queries.sql");
+const SCHEMA: &str = include_str!("schema.sql");
+const QUERIES: &str = include_str!("queries.sql");
 
 struct NoriaTrawlerBuilder(Option<ZookeeperAuthority>);
 

@@ -21,7 +21,6 @@ use stream_cancel::Valve;
 
 use crate::Readers;
 use timekeeper::{RealTime, SimpleTracker, ThreadTime, Timer, TimerSet};
-use tokio;
 
 #[derive(Debug)]
 pub enum PollEvent {
@@ -273,7 +272,7 @@ impl Domain {
         miss_in: LocalNodeIndex,
     ) {
         let mut tags = Vec::new();
-        if let Some(ref candidates) = self.replay_paths_by_dst.get(miss_in) {
+        if let Some(candidates) = self.replay_paths_by_dst.get(miss_in) {
             if let Some(ts) = candidates.get(miss_columns) {
                 // the clone is a bit sad; self.request_partial_replay doesn't use
                 // self.replay_paths_by_dst.
@@ -348,7 +347,7 @@ impl Domain {
         let mut redundant = false;
         let redo = Redo {
             tag: needed_for,
-            replay_key: replay_key.clone(),
+            replay_key,
             unishard: was_single_shard,
             requesting_shard,
         };
@@ -500,8 +499,8 @@ impl Domain {
                 // -1 when satisfied), which would lead to a deadlock!
                 let mut requests_satisfied = 0;
                 let last = self.replay_paths[&tag].path.last().unwrap();
-                if let Some(ref cs) = self.replay_paths_by_dst.get(last.node) {
-                    if let Some(ref tags) = cs.get(last.partial_key.as_ref().unwrap()) {
+                if let Some(cs) = self.replay_paths_by_dst.get(last.node) {
+                    if let Some(tags) = cs.get(last.partial_key.as_ref().unwrap()) {
                         requests_satisfied = tags
                             .iter()
                             .filter(|tag| {
@@ -1324,7 +1323,7 @@ impl Domain {
                                         Box::new(PersistentState::new(
                                             base_name,
                                             base.key(),
-                                            &params,
+                                            params,
                                         ))
                                     }
                                     _ => Box::new(MemoryState::default()),
@@ -1395,7 +1394,7 @@ impl Domain {
 
                                 let mat_state = if !n.is_reader() {
                                     match self.state.get(local_index) {
-                                        Some(ref s) => {
+                                        Some(s) => {
                                             if s.is_partial() {
                                                 MaterializationStatus::Partial {
                                                     beyond_materialization_frontier: n.purge,
@@ -1487,7 +1486,7 @@ impl Domain {
                                     Some((
                                         tag,
                                         requesting_shard,
-                                        mem::replace(keys, HashSet::new()),
+                                        std::mem::take(keys),
                                         single_shard,
                                     ))
                                 } else {
@@ -1870,7 +1869,7 @@ impl Domain {
                                 for_keys.retain(|k| {
                                     w.redos.contains_key(&(partial_keys.clone(), k.clone()))
                                 });
-                            } else if let Some(ref prev) = self.reader_triggered.get(dst) {
+                            } else if let Some(prev) = self.reader_triggered.get(dst) {
                                 // discard all the keys that we aren't waiting for
                                 for_keys.retain(|k| prev.contains(k));
                             } else {
@@ -2307,8 +2306,8 @@ impl Domain {
                                     }
 
                                     if evict_tag.is_none() {
-                                        if let Some(ref cs) = self.replay_paths_by_dst.get(pn) {
-                                            if let Some(ref tags) = cs.get(&lookup.cols) {
+                                        if let Some(cs) = self.replay_paths_by_dst.get(pn) {
+                                            if let Some(tags) = cs.get(&lookup.cols) {
                                                 // this is the tag we would have used to
                                                 // fill a lookup hole in this ancestor, so
                                                 // this is the tag we need to evict from.
@@ -2542,7 +2541,6 @@ impl Domain {
                     // there are no more holes that are filling, so there can't be more redos
                     assert!(waiting.redos.is_empty());
                 }
-                return;
             } else if for_keys.is_some() {
                 unreachable!("got unexpected replay of {:?} for {:?}", for_keys, ni)
             } else {
@@ -2654,7 +2652,7 @@ impl Domain {
             nodes: &DomainNodes,
         ) {
             // TODO: this is a linear walk of replay paths -- we should make that not linear
-            for (tag, ref path) in replay_paths {
+            for (tag, path) in replay_paths {
                 if path.source == Some(node) {
                     // Check whether this replay path is for the same key.
                     match path.trigger {
@@ -2671,7 +2669,7 @@ impl Domain {
                     walk_path(&path.path[..], &mut keys, *tag, shard, nodes, ex);
 
                     if let TriggerEndpoint::Local(_) = path.trigger {
-                        let target = replay_paths[&tag].path.last().unwrap();
+                        let target = replay_paths[tag].path.last().unwrap();
                         if nodes[target.node].borrow().is_reader() {
                             // already evicted from in walk_path
                             continue;

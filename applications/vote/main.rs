@@ -457,7 +457,7 @@ where
                     let (keys, times) = queued_w.pop_front().expect("!is_empty");
                     ops += keys.len();
                     enqueue(
-                        &mut *handle.borrow_mut(),
+                        *handle.borrow_mut(),
                         times,
                         keys,
                         true,
@@ -471,7 +471,7 @@ where
                     let (keys, times) = queued_r.pop_front().expect("!is_empty");
                     ops += keys.len();
                     enqueue(
-                        &mut *handle.borrow_mut(),
+                        *handle.borrow_mut(),
                         times,
                         keys,
                         false,

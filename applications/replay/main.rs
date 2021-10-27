@@ -299,9 +299,7 @@ async fn main() {
         DurabilityMode::MemoryOnly
     };
 
-    persistence.log_dir = args
-        .value_of("log-dir")
-        .and_then(|p| Some(PathBuf::from(p)));
+    persistence.log_dir = args.value_of("log-dir").map(PathBuf::from);
 
     let zk_address = args.value_of("zookeeper-address").unwrap();
     let authority = Arc::new(ZookeeperAuthority::new(zk_address).unwrap());

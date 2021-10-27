@@ -134,7 +134,7 @@ where
         // group by all columns
         self.cols = srcn.fields().len();
         self.group_by.extend(self.inner.group_by().iter().cloned());
-        self.group_by.sort();
+        self.group_by.sort_unstable();
         // cache the range of our output keys
         self.out_key = (0..self.group_by.len()).collect();
 
@@ -245,7 +245,7 @@ where
                     });
 
                     // new is the result of applying all diffs for the group to the current value
-                    let new = inner.apply(current.as_ref().map(|v| &**v), &mut diffs as &mut _);
+                    let new = inner.apply(current.as_deref(), &mut diffs as &mut _);
                     match current {
                         Some(ref current) if new == **current => {
                             // no change

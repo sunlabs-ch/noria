@@ -47,7 +47,7 @@ impl MirNode {
             columns,
             inner,
             ancestors: ancestors.clone(),
-            children: children.clone(),
+            children,
             flow_node: None,
         };
 
@@ -260,9 +260,9 @@ impl MirNode {
                             Some(ref table) => {
                                 let key = (c.name.clone(), Some(table.clone()));
                                 match map.get(&key) {
-                                    Some(ref t_name) => get_column_index(c, t_name),
+                                    Some(t_name) => get_column_index(c, t_name),
                                     None => match map.get(&(c.name.clone(), None)) {
-                                        Some(ref t_name) => get_column_index(c, t_name),
+                                        Some(t_name) => get_column_index(c, t_name),
                                         None => {
                                             panic!("alias is not in mapping table!");
                                         }
@@ -270,7 +270,7 @@ impl MirNode {
                                 }
                             }
                             None => match map.get(&(c.name.clone(), None)) {
-                                Some(ref t_name) => get_column_index(c, t_name),
+                                Some(t_name) => get_column_index(c, t_name),
                                 None => panic!(
                                     "tried to look up non-existent column {:?} on node \
                                      \"{}\" (columns: {:?})",
@@ -339,19 +339,19 @@ impl MirNode {
                 }
             }
             MirNodeType::Filter { .. } => {
-                let parent = self.ancestors.iter().next().unwrap();
+                let parent = self.ancestors.get(0).unwrap();
                 // need all parent columns
                 for c in parent.borrow().columns() {
-                    if !columns.contains(&c) {
+                    if !columns.contains(c) {
                         columns.push(c.clone());
                     }
                 }
             }
             MirNodeType::FilterAggregation { ref on, .. } => {
-                let parent = self.ancestors.iter().next().unwrap();
+                let parent = self.ancestors.get(0).unwrap();
                 // need all parent columns
                 for c in parent.borrow().columns() {
-                    if !columns.contains(&c) {
+                    if !columns.contains(c) {
                         columns.push(c.clone());
                     }
                 }
@@ -362,7 +362,7 @@ impl MirNode {
             }
             MirNodeType::Project { ref emit, .. } => {
                 for c in emit {
-                    if !columns.contains(&c) {
+                    if !columns.contains(c) {
                         columns.push(c.clone());
                     }
                 }

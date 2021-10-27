@@ -322,7 +322,7 @@ mod tests {
         let b = Base::new(vec![]).with_key(vec![0, 2]);
         let global = graph.add_node(Node::new("b", &["x", "y", "z"], b));
         graph.add_edge(source, global, ());
-        let local = unsafe { LocalNodeIndex::make(0 as u32) };
+        let local = unsafe { LocalNodeIndex::make(0_u32) };
         let mut ip: IndexPair = global.into();
         ip.set_local(local);
         graph

@@ -1,6 +1,6 @@
 use crate::clients::localsoup::graph::RECIPE;
 use crate::clients::{Parameters, ReadRequest, VoteClient, WriteRequest};
-use clap;
+
 use failure::ResultExt;
 use noria::{self, ControllerHandle, TableOperation, ZookeeperAuthority};
 use std::future::Future;

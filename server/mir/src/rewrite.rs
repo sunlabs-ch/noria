@@ -30,7 +30,7 @@ pub(super) fn make_universe_naming_consistent(
     nodes_to_check.push(leaf_node.clone());
 
     // get the node that is the base table of the universe
-    let mut base_node: MirNodeRef = leaf_node.clone();
+    let mut base_node: MirNodeRef = leaf_node;
     while !nodes_to_check.is_empty() {
         let node_to_check = nodes_to_check.pop().unwrap();
         if node_to_check.borrow().name == base_name {
@@ -43,7 +43,7 @@ pub(super) fn make_universe_naming_consistent(
     }
 
     let mut nodes_to_rewrite: Vec<MirNodeRef> = Vec::new();
-    nodes_to_rewrite.push(base_node.clone());
+    nodes_to_rewrite.push(base_node);
 
     while !nodes_to_rewrite.is_empty() {
         let node_to_rewrite = nodes_to_rewrite.pop().unwrap();
@@ -99,7 +99,7 @@ pub(super) fn pull_required_base_columns(
 
         let mut found: Vec<&Column> = Vec::new();
         match table_mapping {
-            Some(ref map) => {
+            Some(map) => {
                 for ancestor in mn.borrow().ancestors() {
                     if ancestor.borrow().ancestors().is_empty() {
                         // base, do nothing

@@ -121,9 +121,7 @@ macro_rules! row {
                         }
                     }
 
-                    if !allow_null && row[coli].is_none() {
-                        panic!("Column {} is declared NOT NULL, has no default, and was not provided", cname);
-                    }
+                    assert!(!(!allow_null && row[coli].is_none()), "Column {} is declared NOT NULL, has no default, and was not provided", cname);
                 }
                 _ => { /* leave column value as None */ }
             }

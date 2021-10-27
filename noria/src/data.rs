@@ -214,7 +214,7 @@ impl Ord for DataType {
             | (&DataType::TinyText(..), &DataType::Text(..)) => {
                 let a: &str = self.into();
                 let b: &str = other.into();
-                a.cmp(&b)
+                a.cmp(b)
             }
             (&DataType::BigInt(a), &DataType::BigInt(ref b)) => a.cmp(b),
             (&DataType::UnsignedBigInt(a), &DataType::UnsignedBigInt(ref b)) => a.cmp(b),
@@ -343,9 +343,7 @@ impl From<f32> for DataType {
 
 impl From<f64> for DataType {
     fn from(f: f64) -> Self {
-        if !f.is_finite() {
-            panic!();
-        }
+        assert!(f.is_finite(), "{:?}", ..);
 
         let mut i = f.trunc() as i64;
         let mut frac = (f.fract() * FLOAT_PRECISION).round() as i32;
@@ -577,7 +575,7 @@ impl TryFrom<mysql_common::value::Value> for DataType {
                         hour.into(),
                         minutes.into(),
                         seconds.into(),
-                        micros.into(),
+                        micros,
                     ),
                 ))
             }
@@ -791,7 +789,7 @@ mod tests {
 
         // Test Value::Date.
         let ts = NaiveDate::from_ymd(1111, 1, 11).and_hms_micro(2, 3, 4, 5);
-        let a = Value::from(ts.clone());
+        let a = Value::from(ts);
         let a_dt = DataType::try_from(a);
         assert!(a_dt.is_ok());
         assert_eq!(a_dt.unwrap(), DataType::Timestamp(ts));

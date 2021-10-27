@@ -94,7 +94,7 @@ fn set_panic_hook(panic_state: Arc<Mutex<Option<PanicState>>>) {
         .to_owned();
 
         let (file, line) = match info.location() {
-            Some(ref l) => (l.file().to_owned(), l.line()),
+            Some(l) => (l.file().to_owned(), l.line()),
             None => ("[unknown]".to_owned(), 0),
         };
         *panic_state.lock().unwrap() = Some(PanicState {
@@ -134,8 +134,8 @@ pub fn setup_mysql(addr: &str) -> mysql::Pool {
     use mysql::Opts;
 
     let addr = format!("mysql://{}", addr);
-    let db = &addr[addr.rfind("/").unwrap() + 1..];
-    let options = Opts::from_url(&addr[0..addr.rfind("/").unwrap()]).unwrap();
+    let db = &addr[addr.rfind('/').unwrap() + 1..];
+    let options = Opts::from_url(&addr[0..addr.rfind('/').unwrap()]).unwrap();
 
     // clear the db (note that we strip of /db so we get default)
     let opts = OptsBuilder::from_opts(options.clone())
@@ -320,7 +320,7 @@ async fn check_query(
             })
             .collect();
 
-        match compare_results(&target_results, &query_results) {
+        match compare_results(target_results, &query_results) {
             Some(diff) => {
                 return Err(format!(
                     "MySQL and Soup results do not match for ? = {:?}\n{}",
@@ -338,7 +338,7 @@ async fn check_query(
 #[test]
 #[ignore]
 fn mysql_comparison() {
-    println!("");
+    println!();
 
     let mut schemas: BTreeMap<String, Schema> = BTreeMap::new();
     run_for_all_in_directory("schemas", |file_name, contents| {
@@ -369,7 +369,7 @@ fn mysql_comparison() {
                 let mut line = String::new();
                 while reader.read_line(&mut line).unwrap() > 0 {
                     data.push(
-                        line.split("\t")
+                        line.split('\t')
                             .map(str::trim)
                             .map(|s| s.to_owned())
                             .collect(),
@@ -401,7 +401,7 @@ fn mysql_comparison() {
                 continue;
             }
 
-            if query.values.len() == 0 {
+            if query.values.is_empty() {
                 println!("\x1B[33mPASS\x1B[m");
                 continue;
             }

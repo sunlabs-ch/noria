@@ -297,13 +297,12 @@ impl Packet {
     }
 
     pub(crate) fn take_data(&mut self) -> Records {
-        use std::mem;
         let inner = match *self {
             Packet::Message { ref mut data, .. } => data,
             Packet::ReplayPiece { ref mut data, .. } => data,
             _ => unreachable!(),
         };
-        mem::replace(inner, Records::default())
+        std::mem::take(inner)
     }
 
     pub(crate) fn clone_data(&self) -> Self {

@@ -67,7 +67,7 @@ impl Clone for Union {
             replay_pieces: Default::default(),
             full_wait_state: FullWait::None,
 
-            me: self.me.clone(),
+            me: self.me,
         }
     }
 }
@@ -320,7 +320,7 @@ impl Ingredient for Union {
                 // and the buffered upquery responses in the inner loop, or the other way around.
                 // since iterating over the buffered upquery respones includes a btree loopup, we
                 // want to do fewer of those, so we do those in the outer loop.
-                let mut replays = self.replay_pieces.iter_mut();
+                let replays = self.replay_pieces.iter_mut();
                 let mut replay_key = None;
                 let mut last_tag = None;
 
@@ -331,7 +331,7 @@ impl Ingredient for Union {
                     from.id()
                 };
 
-                while let Some((&(tag, ref replaying_key, _), ref mut pieces)) = replays.next() {
+                for (&(tag, ref replaying_key, _), ref mut pieces) in replays {
                     assert!(
                         !pieces.buffered.is_empty(),
                         "empty pieces bucket left in replay pieces"
@@ -613,7 +613,7 @@ impl Ingredient for Union {
                 let rs = {
                     keys.iter()
                         .filter_map(|key| {
-                            let rs = rs_by_key.remove(&key[..]).unwrap_or_else(Records::default);
+                            let rs = rs_by_key.remove(&key[..]).unwrap_or_default();
 
                             // store this replay piece
                             use std::collections::btree_map::Entry;
@@ -678,7 +678,7 @@ impl Ingredient for Union {
                             pieces.buffered.into_iter()
                         })
                         .flat_map(|(from, rs)| {
-                            self.on_input(ex, from, rs, Some(&key_cols[..]), n, s)
+                            self.on_input(ex, from, rs, Some(key_cols), n, s)
                                 .results
                         })
                         .collect()
@@ -861,7 +861,7 @@ mod tests {
         // forward from right should emit subset record
         let right = vec![1.into(), "skipped".into(), "x".into()];
         assert_eq!(
-            u.one_row(r, right.clone(), false),
+            u.one_row(r, right, false),
             vec![vec![1.into(), "x".into()]].into()
         );
     }

@@ -27,7 +27,7 @@ pub fn rewind_until_columns_found(leaf: MirNodeRef, columns: &[Column]) -> Optio
             }
         }
         if !missing_any {
-            return Some(cur.clone());
+            return Some(cur);
         }
     }
 }
@@ -161,7 +161,7 @@ pub fn merge_mir_for_queries(
             .iter()
             .map(|a| match reuse.get(&a.borrow().versioned_name()) {
                 None => a,
-                Some(ref reused) => reused,
+                Some(reused) => reused,
             })
             .cloned()
             .collect();
@@ -172,7 +172,7 @@ pub fn merge_mir_for_queries(
             .iter()
             .map(|c| match reuse.get(&c.borrow().versioned_name()) {
                 None => c,
-                Some(ref reused) => reused,
+                Some(reused) => reused,
             })
             .cloned()
             .collect();

@@ -11,9 +11,9 @@ use std::collections::HashMap;
 // for example by merging certain nodes together.
 // Return a list of any new nodes created so that the caller
 // can add them to any other internal representations.
-pub fn optimize(mut q: &mut MirQuery) -> Vec<MirNodeRef> {
+pub fn optimize(q: &mut MirQuery) -> Vec<MirNodeRef> {
     //remove_extraneous_projections(&mut q);
-    find_and_merge_filter_aggregates(&mut q)
+    find_and_merge_filter_aggregates(q)
 }
 
 pub fn optimize_post_reuse(_q: &mut MirQuery) {
@@ -183,10 +183,10 @@ fn find_and_merge_filter_aggregates(q: &mut MirQuery) -> Vec<MirNodeRef> {
             child.from_version,
             child.columns.clone(),
             MirNodeType::FilterAggregation {
-                on: on,
+                on,
                 else_on: None,
-                group_by: group_by,
-                kind: kind,
+                group_by,
+                kind,
                 conditions: cond,
             },
             n.borrow().ancestors.clone(),
@@ -293,13 +293,12 @@ fn end_filter_chain(chained_filters: &mut Vec<MirNodeRef>) {
         let last_node = chained_filters.last().unwrap();
         let schema_version = first_node.borrow().from_version;
 
-        let name =
-            chained_filters
-                .iter()
-                .fold("merged_filter_".to_string(), |mut acc, ref node| {
-                    acc.push_str(node.borrow().name());
-                    acc
-                });
+        let name = chained_filters
+            .iter()
+            .fold("merged_filter_".to_string(), |mut acc, node| {
+                acc.push_str(node.borrow().name());
+                acc
+            });
 
         let prev_node = first_node.borrow().ancestors.first().unwrap().clone();
         let fields = prev_node.borrow().columns().to_vec();
@@ -310,7 +309,7 @@ fn end_filter_chain(chained_filters: &mut Vec<MirNodeRef>) {
             schema_version,
             fields,
             MirNodeType::Filter {
-                conditions: merged_conditions.clone(),
+                conditions: merged_conditions,
             },
             vec![prev_node],
             vec![],
@@ -340,7 +339,7 @@ fn to_conditions(chained_filters: &[MirNodeRef]) -> Vec<(usize, FilterCondition)
                 // Note that this assumes that there is only ever one column being filtered on for
                 // each filter that is being merged.
                 for (i, cond) in conditions {
-                    merged_conditions.push((i.clone(), cond.clone()));
+                    merged_conditions.push((*i, cond.clone()));
                 }
             }
             _ => unreachable!(),

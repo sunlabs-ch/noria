@@ -435,7 +435,7 @@ mod tests {
         let (r, mut w) = new(2, &[0]);
         w.add(vec![Record::Positive(a.clone())]);
         w.swap();
-        w.add(vec![Record::Positive(b.clone())]);
+        w.add(vec![Record::Positive(b)]);
 
         assert_eq!(r.try_find_and(&a[0..1], |rs| rs.len()).unwrap().0, Some(1));
         assert!(r
@@ -457,7 +457,7 @@ mod tests {
         w.add(vec![Record::Positive(a.clone())]);
         w.add(vec![Record::Positive(b.clone())]);
         w.swap();
-        w.add(vec![Record::Positive(c.clone())]);
+        w.add(vec![Record::Positive(c)]);
 
         assert_eq!(r.try_find_and(&a[0..1], |rs| rs.len()).unwrap().0, Some(2));
         assert!(r
@@ -554,7 +554,7 @@ mod tests {
         w.add(vec![
             Record::Negative(a.clone()),
             Record::Positive(c.clone()),
-            Record::Negative(c.clone()),
+            Record::Negative(c),
         ]);
         w.swap();
 

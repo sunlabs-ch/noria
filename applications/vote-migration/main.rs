@@ -131,7 +131,7 @@ async fn one(s: &graph::Builder, skewed: bool, args: &clap::ArgMatches<'_>, w: O
                 let id_zipf = zipf.sample(&mut rand::thread_rng());
                 let id: usize = if skewed { id_zipf } else { id_uniform };
                 let r = read_old.lookup(&[DataType::from(id)], false).await;
-                if succeeded && !r.is_ok() {
+                if succeeded && r.is_err() {
                     // an error occurred after the view became available...
                     r.unwrap();
                     return;

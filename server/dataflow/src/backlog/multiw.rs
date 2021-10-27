@@ -1,7 +1,6 @@
 use super::{key_to_double, key_to_single, Key};
 use crate::prelude::*;
 use ahash::RandomState;
-use evmap;
 
 pub(super) enum Handle {
     Single(evmap::WriteHandle<DataType, Vec<DataType>, i64, RandomState>),
@@ -112,7 +111,7 @@ impl Handle {
                     );
                     let stack_key = mem::transmute::<_, &(DataType, DataType)>(&stack_key);
                     let map = h.read()?;
-                    let v = map.get(&stack_key).map(then);
+                    let v = map.get(stack_key).map(then);
                     let m = *map.meta();
                     Some((v, m))
                 }

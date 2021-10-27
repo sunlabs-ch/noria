@@ -289,7 +289,7 @@ impl Node {
                 i.on_eviction(from, tag, keys);
             }
             NodeType::Reader(ref mut r) => {
-                r.on_eviction(&keys[..]);
+                r.on_eviction(keys);
             }
             NodeType::Ingress => {}
             NodeType::Dropped => {}

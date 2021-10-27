@@ -48,9 +48,7 @@ impl VoteClient for LocalNoria {
         persistence.flush_timeout = time::Duration::new(0, flush_ns);
         persistence.persistence_threads = value_t_or_exit!(args, "persistence-threads", i32);
         persistence.log_prefix = "vote".to_string();
-        persistence.log_dir = args
-            .value_of("log-dir")
-            .and_then(|p| Some(PathBuf::from(p)));
+        persistence.log_dir = args.value_of("log-dir").map(PathBuf::from);
 
         // setup db
         let mut s = graph::Builder::default();
@@ -61,7 +59,7 @@ impl VoteClient for LocalNoria {
         };
         s.stupid = args.is_present("stupid");
         let purge = args.value_of("purge").unwrap().to_string();
-        s.purge = purge.clone();
+        s.purge = purge;
 
         async move {
             let mut g = s.start(persistence).await?;
