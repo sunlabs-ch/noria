@@ -1,3 +1,16 @@
+This is a fork of https://github.com/mit-pdos/noria
+
+Wanted to try out the project but the original repository is oudated and unmaintained.
+
+Changes made:
+ - 1 run of Cargo fmt and cargo fix
+ - Fixed the evmap version
+ - Updated the Cargo.lock file
+
+If you are looking for a k8s hosted noria controller, check out https://github.com/fussybeaver/noria-operator
+
+I do not possess general knowlage over noria and it's companion parts nor do I maintain the project. Though if somebody does, let me know and I'm happy to help.
+
 # Noria: data-flow for high-performance web applications
 
 [![noria on crates.io](https://img.shields.io/crates/v/noria.svg)](https://crates.io/crates/noria)
