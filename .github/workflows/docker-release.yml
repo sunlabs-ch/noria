@@ -50,3 +50,4 @@ jobs:
       env:
         VERSION: ${{ steps.version.outputs.tag }}
       run:  docker buildx build --platform=linux/amd64,linux/arm64/v8 --push --build-arg BUILD_EXTENSION="-slim" --build-arg EXPORT_EXTENSION="stable-slim" --tag chweicki/noria-server:$VERSION-slim .
+
