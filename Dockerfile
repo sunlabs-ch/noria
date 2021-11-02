@@ -1,4 +1,5 @@
 ARG BUILD_EXTENSION=
+ARG EXPORT_EXTENSION=latest
 FROM rust:1.56.1${BUILD_EXTENSION} AS noria-server
 
 WORKDIR /tmp/noria
@@ -18,7 +19,7 @@ RUN apt-get update && \
 
 RUN cargo build --release --bin noria-server
 
-ARG EXPORT_EXTENSION=
+ARG EXPORT_EXTENSION=latest
 FROM debian:${EXPORT_EXTENSION}
 
 COPY --from=noria-server /tmp/noria/target/release/noria-server /bin/noria-server
