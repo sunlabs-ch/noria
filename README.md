@@ -6,10 +6,14 @@ Changes made:
  - 1 run of Cargo fmt and cargo fix
  - Fixed the evmap version
  - Updated the Cargo.lock file
+ - Added docker image releases
+ - Added gitpod file and button
 
 If you are looking for a k8s hosted noria controller, check out https://github.com/fussybeaver/noria-operator
 
 I do not possess general knowlage over noria and it's companion parts nor do I maintain the project. Though if somebody does, let me know and I'm happy to help.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/somehowchris/noria)
 
 # Noria: data-flow for high-performance web applications
 

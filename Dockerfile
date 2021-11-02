@@ -1,4 +1,5 @@
-FROM rust:1.56.0-slim AS noria-server
+ARG EXTENSION=
+FROM rust:1.56.1${EXTENSION} AS noria-server
 
 WORKDIR /tmp/noria
 
@@ -15,4 +16,4 @@ RUN apt-get update && \
         default-mysql-client && \
     apt-get clean 
 
-RUN cargo build --release --bin noria-server
+RUN cargo build --release --workspace

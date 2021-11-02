@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Default Docker image
+      run: docker build .
+    - name: Build the Slim Docker image
+      run: docker build --build-arg EXTENSION="-slim" .
+    - name: Build the Alpine Docker image
+      run: docker build --file Dockerfile.alpine .
+
