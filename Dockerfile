@@ -1,5 +1,5 @@
-ARG EXTENSION=
-FROM rust:1.56.1${EXTENSION} AS noria-server
+ARG BUILD_EXTENSION=
+FROM rust:1.56.1${BUILD_EXTENSION} AS noria-server
 
 WORKDIR /tmp/noria
 
@@ -16,4 +16,11 @@ RUN apt-get update && \
         default-mysql-client && \
     apt-get clean 
 
-RUN cargo build --release --workspace
+RUN cargo build --release --bin noria-server
+
+ARG EXPORT_EXTENSION=
+FROM debian:${EXPORT_EXTENSION}
+
+COPY --from=noria-server /tmp/noria/target/release/noria-server /bin/noria-server
+
+ENTRYPOINT /bin/noria-server

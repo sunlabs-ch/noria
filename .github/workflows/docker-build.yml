@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build:
+  build-default:
 
     runs-on: ubuntu-latest
 
@@ -16,8 +16,12 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Default Docker image
       run: docker build .
-    - name: Build the Slim Docker image
-      run: docker build --build-arg EXTENSION="-slim" .
-    - name: Build the Alpine Docker image
-      run: docker build --file Dockerfile.alpine .
 
+  build-slim:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Slim Docker image
+      run: docker build --build-arg BUILD_EXTENSION="-slim" --build-arg EXPORT_EXTENSION="stable-slim" .
