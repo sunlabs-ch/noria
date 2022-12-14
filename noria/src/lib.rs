@@ -206,6 +206,7 @@ use tokio_tower::multiplex;
 
 mod controller;
 mod data;
+mod rpc;
 mod table;
 mod view;
 
@@ -295,8 +296,8 @@ impl<T> From<T> for Tagged<T> {
     }
 }
 
-pub use crate::controller::{ControllerDescriptor, ControllerHandle};
 pub use crate::data::{DataType, Modification, Operation, TableOperation};
+pub use crate::rpc::{ControllerDescriptor, ControllerHandle};
 pub use crate::table::Table;
 pub use crate::view::View;
 
